@@ -1,0 +1,94 @@
+#include <LiquidCrystal.h>
+
+LiquidCrystal lcd(12,8,5,4,3,2);
+
+const int k_led = 11;
+const int Y_led = 10;
+const int M_led = 9;
+
+int lm35Pin = A0;
+int okunan_deger = 0;
+int sure;
+int mesafe;
+
+float sicaklik_gerilim = 0;
+float sicaklik = 0;
+
+const int trigger_pin = 7;
+const int echo_pin = 6;
+
+void setup()
+{
+lcd.begin(16, 2); 
+ 
+ pinMode(k_led, OUTPUT);
+  pinMode(Y_led, OUTPUT);
+  pinMode(M_led, OUTPUT);
+
+ pinMode(trigger_pin, OUTPUT);
+  pinMode(echo_pin, INPUT);
+
+  Serial.begin(9600);
+}
+
+void loop() 
+{
+okunan_deger = analogRead(lm35Pin);
+sicaklik_gerilim = (5000.0/1023.0)*okunan_deger;
+sicaklik = (sicaklik_gerilim /10.0 - 32)/1.80;
+(1/((331 * sq((sicaklik+273) / 273) * 100 ) / 1000000));
+
+  digitalWrite(trigger_pin, HIGH);
+  delayMicroseconds(1000);
+  digitalWrite(trigger_pin, LOW);
+  sure = pulseIn(echo_pin, HIGH);
+  mesafe = (sure/2) / (1/((331 * sq((sicaklik+273) / 273) * 100 ) / 1000000));
+
+  Serial.print("Mesafe = ");
+  Serial.println(mesafe);
+  delay(500);
+  Serial.print("Derece = ");
+  Serial.println(sicaklik);
+
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("mesafe  sicaklik");
+  lcd.setCursor(0, 1);
+  lcd.print(mesafe);
+  lcd.print("cm");
+  lcd.setCursor(10, 1);
+  lcd.print(sicaklik);
+  delay(250);
+
+  if (mesafe>5){
+    digitalWrite(k_led, LOW);
+  digitalWrite(Y_led, LOW);
+  digitalWrite(M_led, HIGH);
+  }
+  if (mesafe>10){
+    digitalWrite(k_led, LOW);
+  digitalWrite(Y_led, HIGH);
+  digitalWrite(M_led, LOW);
+  }
+  if (mesafe>20){
+  digitalWrite(k_led, HIGH);
+  digitalWrite(Y_led, LOW);
+  digitalWrite(M_led, LOW);  
+  }
+}
+  if (mesafe>5){
+    digitalWrite(k_led, LOW);
+  digitalWrite(Y_led, LOW);
+  digitalWrite(M_led, HIGH);
+  }
+  if (mesafe>10){
+    digitalWrite(k_led, LOW);
+  digitalWrite(Y_led, HIGH);
+  digitalWrite(M_led, LOW);
+  }
+  if (mesafe>20){
+  digitalWrite(k_led, HIGH);
+  digitalWrite(Y_led, LOW);
+  digitalWrite(M_led, LOW); 
+  }
+}
